@@ -2,13 +2,13 @@ import type { Contents } from '@jupyterlab/services';
 import { PARSERS } from './parsers';
 import type { IRule, IKernelspec } from './parsers';
 
-const DEFAULT_KERNELSPEC: IKernelspec = {
+export const DEFAULT_KERNELSPEC: IKernelspec = {
   name: 'xpython',
   display_name: 'Python 3.13 (XPython)',
   language: 'python'
 };
 
-function extractKernelspecFromText(text: string): IKernelspec | null {
+export function extractKernelspecFromText(text: string): IKernelspec | null {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
 
   const isCommentStyle = !!lines[0]?.match(/^#\s*---\s*$/);

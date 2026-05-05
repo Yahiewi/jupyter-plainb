@@ -6,21 +6,36 @@ import { showDialog, Dialog } from '@jupyterlab/apputils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { MenuSvg } from '@jupyterlab/ui-components';
-import { PARSERS, PARSER_LABELS, PARSER_EXTENSIONS } from './parsers';
-import type {
+import { PARSERS, PARSER_LABELS, PARSER_EXTENSIONS, SERIALIZERS } from './parsers';
+import {
   ParserName,
   IPlainTextNotebookConfig,
   IKernelspec
 } from './parsers';
 import { convertFile, autoConvert } from './convert';
+import {
+  NotebookPanel,
+  NotebookWidgetFactory
+} from '@jupyterlab/notebook';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
+import { IEditorServices } from '@jupyterlab/codeeditor';
+import { PlainTextNotebookModelFactory } from './model';
 
 export const plugin: JupyterFrontEndPlugin<void> = {
   id: 'ptjnb:plugin',
   autoStart: true,
-  requires: [IFileBrowserFactory],
+  requires: [
+    IFileBrowserFactory,
+    IRenderMimeRegistry,
+    NotebookPanel.IContentFactory,
+    IEditorServices
+  ],
   activate: async (
     app: JupyterFrontEnd,
-    browserFactory: IFileBrowserFactory
+    browserFactory: IFileBrowserFactory,
+    rendermime: IRenderMimeRegistry,
+    contentFactory: NotebookPanel.IContentFactory,
+    editorServices: IEditorServices
   ) => {
     console.log('ptjnb extension activated!');
     const { commands, contextMenu } = app;
@@ -40,6 +55,33 @@ export const plugin: JupyterFrontEndPlugin<void> = {
       const commandId = `ptjnb:convert-${parserName}`;
       const parser = PARSERS[parserName];
       const exts = PARSER_EXTENSIONS[parserName];
+      const serializer = SERIALIZERS[parserName];
+      const fileTypes = exts.includes('.py') ? ['python'] : ['markdown'];
+      const modelName = `ptjnb-${parserName}`;
+      const mimeTypeService = editorServices.mimeTypeService;
+
+      const modelFactory = new PlainTextNotebookModelFactory({
+        name: modelName,
+        parser,
+        serializer
+      });
+      app.docRegistry.addModelFactory(modelFactory);
+
+      const widgetFactory = new NotebookWidgetFactory({
+        name: PARSER_LABELS[parserName],
+        modelName: modelName,
+        fileTypes: fileTypes,
+        rendermime,
+        contentFactory,
+        mimeTypeService,
+        defaultFor: []
+      });
+      app.docRegistry.addWidgetFactory(widgetFactory);
+
+      // Inherit the toolbar and other widget extensions from the standard Notebook widget
+      for (const ext of app.docRegistry.widgetExtensions('Notebook')) {
+        app.docRegistry.addWidgetExtension(widgetFactory.name, ext);
+      }
 
       commands.addCommand(commandId, {
         label: PARSER_LABELS[parserName],

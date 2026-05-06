@@ -28,6 +28,7 @@ import { convertFile, autoConvert } from './convert';
 import {
   INotebookTracker,
   NotebookPanel,
+  NotebookTracker,
   NotebookWidgetFactory
 } from '@jupyterlab/notebook';
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
@@ -130,17 +131,17 @@ export const plugin: JupyterFrontEndPlugin<void> = {
         translator: translator ?? nullTranslator
       });
 
-      // Inject each created panel into the notebook tracker so that
-      // all standard notebook commands (run cell, insert cell, cut/paste,
-      // keyboard shortcuts, etc.) recognise it as the active notebook.
-      // inject() is used instead of add() to avoid interfering with the
-      // standard notebook's save/restore logic.
+      // Add each created panel to the notebook tracker so that all standard
+      // notebook commands (run cell, insert cell, cut/paste, keyboard
+      // shortcuts, etc.) recognise it as the active notebook.
+      // We use add() rather than inject() because inject() skips the
+      // FocusTracker, which is what determines tracker.currentWidget.
       widgetFactory.widgetCreated.connect((_sender, widget) => {
         widget.id = widget.id || `ptjnb-${++ptjnbId}`;
         widget.title.icon = undefined;
 
         if (notebookTracker) {
-          notebookTracker.inject(widget);
+          void (notebookTracker as NotebookTracker).add(widget);
         }
       });
 

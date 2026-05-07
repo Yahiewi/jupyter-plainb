@@ -13,7 +13,10 @@ function fileItem(page: Page, name: string) {
   return page.locator('.jp-DirListing-item').filter({ hasText: name }).first();
 }
 
-async function openNotebookSubmenu(page: Page, fileName: string): Promise<void> {
+async function openNotebookSubmenu(
+  page: Page,
+  fileName: string
+): Promise<void> {
   await fileItem(page, fileName).click({ button: 'right' });
   await page
     .locator('.lm-Menu-itemLabel')
@@ -21,7 +24,10 @@ async function openNotebookSubmenu(page: Page, fileName: string): Promise<void> 
     .hover();
 }
 
-async function openPlainTextSubmenu(page: Page, fileName: string): Promise<void> {
+async function openPlainTextSubmenu(
+  page: Page,
+  fileName: string
+): Promise<void> {
   await fileItem(page, fileName).click({ button: 'right' });
   await page
     .locator('.lm-Menu-itemLabel')

@@ -53,7 +53,7 @@ async function openWithNotebook(
 
 test.describe('ptjnb', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?reset');
     await waitForFileBrowser(page);
   });
 
@@ -129,7 +129,7 @@ test.describe('ptjnb', () => {
 
 test.describe('ptjnb open-with', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?reset');
     await waitForFileBrowser(page);
   });
 

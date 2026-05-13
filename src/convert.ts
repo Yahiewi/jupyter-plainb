@@ -80,7 +80,7 @@ export function kernelspecFromLanguage(
     return null;
   }
   const normLang = language.toLowerCase();
-  
+
   const defaultSpecName = specs.default;
   if (defaultSpecName) {
     const defaultSpec = specs.kernelspecs[defaultSpecName];
@@ -232,7 +232,13 @@ async function walkDir(
       item.type === 'file' &&
       (item.name.endsWith('.py') || item.name.endsWith('.md'))
     ) {
-      await convertIfMissing(contents, item.path, parser, defaultKernelspec, specs);
+      await convertIfMissing(
+        contents,
+        item.path,
+        parser,
+        defaultKernelspec,
+        specs
+      );
     }
   }
 }

@@ -216,7 +216,13 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                 return;
               }
             }
-            await convertFile(contents, filePath, parser, defaultKernelspec, specs);
+            await convertFile(
+              contents,
+              filePath,
+              parser,
+              defaultKernelspec,
+              specs
+            );
           } catch (e) {
             console.error('ptjnb: conversion failed', e);
           }

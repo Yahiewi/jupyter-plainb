@@ -3,7 +3,11 @@ import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { Contents, KernelSpec } from '@jupyterlab/services';
 import type { ISharedNotebook } from '@jupyter/ydoc';
 import type { Notebook } from 'plainb';
-import { DEFAULT_KERNELSPEC, extractKernelspecFromText, kernelspecFromLanguage } from './convert';
+import {
+  DEFAULT_KERNELSPEC,
+  extractKernelspecFromText,
+  kernelspecFromLanguage
+} from './convert';
 
 /**
  * A custom NotebookModel that parses and serializes from/to plain text.

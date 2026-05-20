@@ -262,6 +262,16 @@ test.describe('ptjnb export', () => {
       .locator('.lm-Menu-itemLabel')
       .filter({ hasText: 'Percent format (.py)' })
       .click();
+
+    // If complicated.ipynb already exists from a previous test, dismiss the overwrite dialog
+    const overwriteNbDialog = page.locator('.jp-Dialog-header');
+    await overwriteNbDialog
+      .waitFor({ state: 'visible', timeout: 3000 })
+      .catch(() => {});
+    if (await overwriteNbDialog.isVisible()) {
+      await page.locator('.jp-Dialog-footer .jp-mod-accept').click();
+    }
+
     const ipynb = fileItem(page, 'complicated.ipynb');
     await expect(ipynb).toBeVisible({ timeout: CONVERT_TIMEOUT });
 

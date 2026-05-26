@@ -1,8 +1,4 @@
 ---
-kernelspec:
-  name: ir
-  display_name: R
-  language: R
 language_info:
   name: R
   codemirror_mode: r
@@ -25,9 +21,4 @@ print(greeting)
 
 x <- c(1, 2, 3, 4, 5)
 mean(x)
-```
-
-```{code-cell}
-:trusted: true
-
 ```

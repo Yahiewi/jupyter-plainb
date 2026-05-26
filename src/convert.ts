@@ -130,10 +130,16 @@ export async function convertFile(
       extractKernelspecFromText(text) ??
       defaultKernelspec ??
       kernelspecFromLanguage(specs ?? null, language) ??
-      DEFAULT_KERNELSPEC;
-    notebook.metadata.kernelspec = kernelspec;
-    if (!notebook.metadata.language_info) {
-      notebook.metadata.language_info = { name: kernelspec.language };
+      (language.toLowerCase() === 'python' ? DEFAULT_KERNELSPEC : undefined);
+    if (kernelspec) {
+      notebook.metadata.kernelspec = kernelspec;
+      if (!notebook.metadata.language_info) {
+        notebook.metadata.language_info = { name: kernelspec.language };
+      }
+    } else {
+      if (!notebook.metadata.language_info) {
+        notebook.metadata.language_info = { name: language };
+      }
     }
   }
   const notebookPath = outPath ?? filePath.replace(/\.(py|md)$/, '.ipynb');

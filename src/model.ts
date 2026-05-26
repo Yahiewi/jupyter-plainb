@@ -62,10 +62,16 @@ export class PlainTextNotebookModel extends NotebookModel {
       const kernelspec =
         extractKernelspecFromText(value) ??
         kernelspecFromLanguage(this._specs, language) ??
-        DEFAULT_KERNELSPEC;
-      notebook.metadata.kernelspec = kernelspec;
-      if (!notebook.metadata.language_info) {
-        notebook.metadata.language_info = { name: kernelspec.language };
+        (language.toLowerCase() === 'python' ? DEFAULT_KERNELSPEC : undefined);
+      if (kernelspec) {
+        notebook.metadata.kernelspec = kernelspec;
+        if (!notebook.metadata.language_info) {
+          notebook.metadata.language_info = { name: kernelspec.language };
+        }
+      } else {
+        if (!notebook.metadata.language_info) {
+          notebook.metadata.language_info = { name: language };
+        }
       }
     }
 

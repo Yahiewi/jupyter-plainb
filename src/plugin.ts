@@ -147,8 +147,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
 
         if (notebookTracker) {
           const tracker = notebookTracker as NotebookTracker;
-          tracker.inject(widget);
-          (tracker as any)._focusTracker.add(widget);
+          void tracker.add(widget);
         }
       });
 

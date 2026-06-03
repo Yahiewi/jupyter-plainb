@@ -11,13 +11,12 @@ import {
 } from '@jupyterlab/apputils';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { PageConfig } from '@jupyterlab/coreutils';
-import { MenuSvg } from '@jupyterlab/ui-components';
+import { MenuSvg, notebookIcon } from '@jupyterlab/ui-components';
 import {
   PARSERS,
   PARSER_LABELS,
   PARSER_EXTENSIONS,
-  SERIALIZERS,
-  CONTEXT_MENU_LABELS
+  SERIALIZERS
 } from './parsers';
 import type {
   ParserName,
@@ -99,35 +98,35 @@ export const plugin: JupyterFrontEndPlugin<void> = {
 
     let ptjnbId = 0;
 
-    (Object.keys(PARSERS) as ParserName[]).forEach(parserName => {
-      const convertCommandId = `ptjnb:convert-${parserName}`;
-      const parser = PARSERS[parserName];
-      const exts = PARSER_EXTENSIONS[parserName];
-      const serializer = SERIALIZERS[parserName];
+    const notebookFileType = app.docRegistry.getFileType('notebook');
 
-      // Names must be lowercase because preferredWidgetFactories is case sensitive
-      const fileTypeName = `ptjnb-${parserName}`.toLowerCase();
-      const modelName = `ptjnb-model-${parserName}`.toLowerCase();
-      const widgetFactoryName = CONTEXT_MENU_LABELS[parserName];
+    // Register one auto-detecting "Notebook" widget factory per extension
+    const EXTENSIONS: Array<{ ext: string; fileTypeName: string; modelName: string }> =
+      [
+        { ext: '.py', fileTypeName: 'ptjnb-py', modelName: 'ptjnb-model-py' },
+        { ext: '.md', fileTypeName: 'ptjnb-md', modelName: 'ptjnb-model-md' }
+      ];
 
+    for (const { ext, fileTypeName, modelName } of EXTENSIONS) {
       app.docRegistry.addFileType({
         name: fileTypeName,
-        extensions: exts,
+        extensions: [ext],
         contentType: 'file',
-        fileFormat: 'text'
+        fileFormat: 'text',
+        icon: notebookFileType?.icon ?? notebookIcon
       });
 
       app.docRegistry.addModelFactory(
         new PlainTextNotebookModelFactory({
           name: modelName,
-          parser,
-          serializer,
+          ext,
           specs
         })
       );
 
       const widgetFactory = new NotebookWidgetFactory({
-        name: widgetFactoryName,
+        name: fileTypeName,
+        label: 'Notebook',
         modelName,
         fileTypes: [fileTypeName],
         defaultFor: [],
@@ -143,7 +142,9 @@ export const plugin: JupyterFrontEndPlugin<void> = {
       // Register each created panel with the notebook tracker.
       widgetFactory.widgetCreated.connect((_sender, widget) => {
         widget.id = widget.id || `ptjnb-${++ptjnbId}`;
-        widget.title.icon = undefined;
+        widget.title.icon = notebookFileType?.icon ?? notebookIcon;
+        widget.title.iconClass = notebookFileType?.iconClass ?? '';
+        widget.title.iconLabel = notebookFileType?.iconLabel ?? '';
 
         if (notebookTracker) {
           const tracker = notebookTracker as NotebookTracker;
@@ -157,10 +158,17 @@ export const plugin: JupyterFrontEndPlugin<void> = {
 
       // Copy any other widget extensions
       void app.restored.then(() => {
-        for (const ext of app.docRegistry.widgetExtensions('Notebook')) {
-          app.docRegistry.addWidgetExtension(widgetFactoryName, ext);
+        for (const e of app.docRegistry.widgetExtensions('Notebook')) {
+          app.docRegistry.addWidgetExtension(fileTypeName, e);
         }
       });
+    }
+
+    // "Convert to Notebook" commands keep an explicit per-format choice.
+    (Object.keys(PARSERS) as ParserName[]).forEach(parserName => {
+      const convertCommandId = `ptjnb:convert-${parserName}`;
+      const parser = PARSERS[parserName];
+      const exts = PARSER_EXTENSIONS[parserName];
 
       commands.addCommand(convertCommandId, {
         label: PARSER_LABELS[parserName],
@@ -231,11 +239,18 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     convertSubmenu.addItem({ command: 'ptjnb:convert-parseClassicMd' });
     convertSubmenu.addItem({ command: 'ptjnb:convert-parseMystMd' });
 
-    contextMenu.addItem({
-      type: 'submenu',
-      submenu: convertSubmenu,
-      selector: '.jp-DirListing-item[data-isdir="false"]',
-      rank: 10
+    [
+      '.jp-DirListing-item[data-isdir="false"][data-file-type="python"]',
+      '.jp-DirListing-item[data-isdir="false"][data-file-type="markdown"]',
+      '.jp-DirListing-item[data-isdir="false"][data-file-type="ptjnb-py"]',
+      '.jp-DirListing-item[data-isdir="false"][data-file-type="ptjnb-md"]'
+    ].forEach(selector => {
+      contextMenu.addItem({
+        type: 'submenu',
+        submenu: convertSubmenu,
+        selector,
+        rank: 10
+      });
     });
 
     // Reverse conversion: .ipynb to plain text
@@ -315,7 +330,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     contextMenu.addItem({
       type: 'submenu',
       submenu: exportSubmenu,
-      selector: '.jp-DirListing-item[data-isdir="false"]',
+      selector: '.jp-DirListing-item[data-isdir="false"][data-file-type="notebook"]',
       rank: 11
     });
 

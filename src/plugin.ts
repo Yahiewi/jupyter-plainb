@@ -102,11 +102,14 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     const notebookFileType = app.docRegistry.getFileType('notebook');
 
     // Register one auto-detecting "Notebook" widget factory per extension
-    const EXTENSIONS: Array<{ ext: string; fileTypeName: string; modelName: string }> =
-      [
-        { ext: '.py', fileTypeName: 'ptjnb-py', modelName: 'ptjnb-model-py' },
-        { ext: '.md', fileTypeName: 'ptjnb-md', modelName: 'ptjnb-model-md' }
-      ];
+    const EXTENSIONS: Array<{
+      ext: string;
+      fileTypeName: string;
+      modelName: string;
+    }> = [
+      { ext: '.py', fileTypeName: 'ptjnb-py', modelName: 'ptjnb-model-py' },
+      { ext: '.md', fileTypeName: 'ptjnb-md', modelName: 'ptjnb-model-md' }
+    ];
 
     for (const { ext, fileTypeName, modelName } of EXTENSIONS) {
       app.docRegistry.addFileType({
@@ -284,12 +287,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
               return;
             }
           }
-          await convertFileAuto(
-            contents,
-            filePath,
-            defaultKernelspec,
-            specs
-          );
+          await convertFileAuto(contents, filePath, defaultKernelspec, specs);
         } catch (e) {
           console.error('ptjnb: conversion failed', e);
         }
@@ -386,7 +384,8 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     contextMenu.addItem({
       type: 'submenu',
       submenu: exportSubmenu,
-      selector: '.jp-DirListing-item[data-isdir="false"][data-file-type="notebook"]',
+      selector:
+        '.jp-DirListing-item[data-isdir="false"][data-file-type="notebook"]',
       rank: 11
     });
 

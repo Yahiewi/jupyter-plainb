@@ -195,7 +195,6 @@ export async function convertFileAuto(
   });
 }
 
-
 /**
  * Convert a .ipynb notebook to a plain text format using a serializer.
  */

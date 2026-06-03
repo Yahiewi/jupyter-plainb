@@ -2,38 +2,13 @@ import { NotebookModel, NotebookModelFactory } from '@jupyterlab/notebook';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { Contents, KernelSpec } from '@jupyterlab/services';
 import type { ISharedNotebook } from '@jupyter/ydoc';
-import {
-  detectFormat,
-  parseClassicMd,
-  parseMystMd,
-  parsePy,
-  parseSphinxGallery,
-  toClassicMd,
-  toMystMd,
-  toPy,
-  toSphinxGallery
-} from 'plainb';
-import type { Notebook, PlainbFormat } from 'plainb';
+import { detectFormat, parseFormat, serializeFormat } from 'plainb';
+import type { PlainbFormat } from 'plainb';
 import {
   DEFAULT_KERNELSPEC,
   extractKernelspecFromText,
   kernelspecFromLanguage
 } from './convert';
-
-const PARSERS_BY_FORMAT: Record<PlainbFormat, (text: string) => object> = {
-  percent: parsePy,
-  'sphinx-gallery': parseSphinxGallery,
-  classic: parseClassicMd,
-  myst: parseMystMd
-};
-
-const SERIALIZERS_BY_FORMAT: Record<PlainbFormat, (notebook: Notebook) => string> =
-  {
-    percent: toPy,
-    'sphinx-gallery': toSphinxGallery,
-    classic: toClassicMd,
-    myst: toMystMd
-  };
 
 /**
  * A custom NotebookModel that parses and serializes from/to plain text. The
@@ -75,12 +50,12 @@ export class PlainTextNotebookModel extends NotebookModel {
       }
     }
 
-    return SERIALIZERS_BY_FORMAT[this._format](json as unknown as Notebook);
+    return serializeFormat(json, this._format);
   }
 
   fromString(value: string): void {
     this._format = detectFormat(value, this._ext);
-    const notebook = PARSERS_BY_FORMAT[this._format](value) as any;
+    const notebook = parseFormat(value, this._format) as any;
 
     // Ensure kernelspec is set
     if (!notebook.metadata?.kernelspec) {

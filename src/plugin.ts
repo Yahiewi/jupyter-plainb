@@ -25,6 +25,7 @@ import type {
 } from './parsers';
 import {
   convertFile,
+  convertFileAuto,
   convertNotebookToPlainText,
   autoConvert
 } from './convert';
@@ -232,12 +233,68 @@ export const plugin: JupyterFrontEndPlugin<void> = {
       });
     });
 
-    const convertSubmenu = new MenuSvg({ commands });
-    convertSubmenu.title.label = 'Convert to Notebook';
-    convertSubmenu.addItem({ command: 'ptjnb:convert-parsePy' });
-    convertSubmenu.addItem({ command: 'ptjnb:convert-parseSphinxGallery' });
-    convertSubmenu.addItem({ command: 'ptjnb:convert-parseClassicMd' });
-    convertSubmenu.addItem({ command: 'ptjnb:convert-parseMystMd' });
+    // Auto-detecting "Convert to Notebook" command
+    commands.addCommand('ptjnb:convert-to-notebook', {
+      label: 'Convert to Notebook',
+      icon: notebookFileType?.icon ?? notebookIcon,
+      isVisible: () => {
+        const browser = getCurrentBrowser();
+        if (!browser) {
+          return false;
+        }
+        const selection = browser.selectedItems();
+        const first = selection.next();
+        if (first.done || !first.value) {
+          return false;
+        }
+        const path = first.value.path;
+        return path.endsWith('.py') || path.endsWith('.md');
+      },
+      execute: async () => {
+        const browser = getCurrentBrowser();
+        if (!browser) {
+          return;
+        }
+        const selection = browser.selectedItems();
+        const first = selection.next();
+        if (first.done || !first.value) {
+          return;
+        }
+        const filePath = first.value.path;
+        const notebookPath = filePath.replace(/\.(py|md)$/, '.ipynb');
+        const contents = app.serviceManager.contents;
+        try {
+          let fileExists = false;
+          try {
+            await contents.get(notebookPath, { content: false });
+            fileExists = true;
+          } catch {
+            /* empty */
+          }
+          if (fileExists) {
+            const result = await showDialog({
+              title: 'Overwrite notebook?',
+              body: `"${notebookPath}" already exists. Overwrite it?`,
+              buttons: [
+                Dialog.cancelButton(),
+                Dialog.warnButton({ label: 'Overwrite' })
+              ]
+            });
+            if (!result.button.accept) {
+              return;
+            }
+          }
+          await convertFileAuto(
+            contents,
+            filePath,
+            defaultKernelspec,
+            specs
+          );
+        } catch (e) {
+          console.error('ptjnb: conversion failed', e);
+        }
+      }
+    });
 
     [
       '.jp-DirListing-item[data-isdir="false"][data-file-type="python"]',
@@ -246,8 +303,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
       '.jp-DirListing-item[data-isdir="false"][data-file-type="ptjnb-md"]'
     ].forEach(selector => {
       contextMenu.addItem({
-        type: 'submenu',
-        submenu: convertSubmenu,
+        command: 'ptjnb:convert-to-notebook',
         selector,
         rank: 10
       });

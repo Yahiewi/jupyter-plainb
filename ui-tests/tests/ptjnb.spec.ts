@@ -139,9 +139,7 @@ test.describe('ptjnb open-with', () => {
       .filter({ hasText: 'Open With' })
       .hover();
     await expect(
-      page
-        .locator('.lm-Menu-itemLabel')
-        .filter({ hasText: 'Notebook' })
+      page.locator('.lm-Menu-itemLabel').filter({ hasText: 'Notebook' })
     ).toBeVisible();
   });
 
@@ -169,11 +167,7 @@ test.describe('ptjnb open-with', () => {
     await expect(fileItem(page, 'image_processing.py')).toBeVisible({
       timeout: FILE_BROWSER_TIMEOUT
     });
-    await openWithNotebook(
-      page,
-      'image_processing.py',
-      'Notebook'
-    );
+    await openWithNotebook(page, 'image_processing.py', 'Notebook');
 
     await expect(page.locator('.jp-NotebookPanel-toolbar')).toBeVisible({
       timeout: CONVERT_TIMEOUT
@@ -190,11 +184,7 @@ test.describe('ptjnb open-with', () => {
     await expect(fileItem(page, 'classic_demo.md')).toBeVisible({
       timeout: FILE_BROWSER_TIMEOUT
     });
-    await openWithNotebook(
-      page,
-      'classic_demo.md',
-      'Notebook'
-    );
+    await openWithNotebook(page, 'classic_demo.md', 'Notebook');
 
     await expect(page.locator('.jp-NotebookPanel-toolbar')).toBeVisible({
       timeout: CONVERT_TIMEOUT

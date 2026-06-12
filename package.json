@@ -1,5 +1,5 @@
 {
-    "name": "ptjnb",
+    "name": "jupyter-plainb",
     "version": "0.1.1",
     "description": "A JupyterLab extension to convert plaintext files to jupyter notebooks",
     "keywords": [
@@ -13,7 +13,7 @@
     },
     "license": "BSD-3-Clause",
     "author": {
-        "name": "ptjnb",
+        "name": "jupyter-plainb",
         "email": "derthorsten@gmail.com"
     },
     "files": [
@@ -41,7 +41,7 @@
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
-        "clean:labextension": "rimraf ptjnb/labextension ptjnb/_version.py",
+        "clean:labextension": "rimraf jupyter_plainb/labextension jupyter_plainb/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -103,7 +103,7 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "ptjnb/labextension"
+        "outputDir": "jupyter_plainb/labextension"
     },
     "eslintIgnore": [
         "node_modules",

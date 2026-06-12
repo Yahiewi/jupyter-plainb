@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0
 build-backend = "hatchling.build"
 
 [project]
-name = "ptjnb"
+name = "jupyter-plainb"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
@@ -33,24 +33,24 @@ source = "nodejs"
 fields = ["description", "authors", "urls", "keywords"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["ptjnb/labextension"]
+artifacts = ["jupyter_plainb/labextension"]
 exclude = [".github", "binder"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"ptjnb/labextension" = "share/jupyter/labextensions/ptjnb"
-"install.json" = "share/jupyter/labextensions/ptjnb/install.json"
+"jupyter_plainb/labextension" = "share/jupyter/labextensions/jupyter-plainb"
+"install.json" = "share/jupyter/labextensions/jupyter-plainb/install.json"
 
 [tool.hatch.build.hooks.version]
-path = "ptjnb/_version.py"
+path = "jupyter_plainb/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "ptjnb/labextension/static/style.js",
-    "ptjnb/labextension/package.json",
+    "jupyter_plainb/labextension/static/style.js",
+    "jupyter_plainb/labextension/package.json",
 ]
-skip-if-exists = ["ptjnb/labextension/static/style.js"]
+skip-if-exists = ["jupyter_plainb/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -60,7 +60,7 @@ npm = ["jlpm"]
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "ptjnb/labextension"
+build_dir = "jupyter_plainb/labextension"
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"

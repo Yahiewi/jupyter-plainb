@@ -17,17 +17,23 @@ pip install jupyter-plainb
 ## Usage
 
 ### 1. Convert to Notebook
+
 Select a `.py` or `.md` file in the file browser → right-click → **Convert to Notebook** submenu → pick a parser.
-* If a `.ipynb` with the same base name already exists, a confirmation dialog asks before overwriting.
+
+- If a `.ipynb` with the same base name already exists, a confirmation dialog asks before overwriting.
 
 ### 2. Open With (Direct notebook editor)
+
 You can open and edit `.py` or `.md` files directly in the JupyterLab Notebook editor without generating a `.ipynb` file.
-* Right-click a `.py` or `.md` file in the file browser → hover over **Open With** → select **Notebook**.
-* Edits and cell runs save directly back to the original plaintext file format.
+
+- Right-click a `.py` or `.md` file in the file browser → hover over **Open With** → select **Notebook**.
+- Edits and cell runs save directly back to the original plaintext file format.
 
 ### 3. Convert to Plain Text (Reverse conversion)
+
 Convert an existing `.ipynb` notebook back to one of the supported plaintext formats.
-* Right-click a `.ipynb` file → hover over **Convert to Plain Text** submenu → select a target format.
+
+- Right-click a `.ipynb` file → hover over **Convert to Plain Text** submenu → select a target format.
 
 ### 4. Auto-convert on startup
 

@@ -60,7 +60,7 @@ async function openWithNotebook(
     .click();
 }
 
-test.describe('ptjnb', () => {
+test.describe('jupyter-plainb', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?reset');
     await waitForFileBrowser(page);
@@ -124,7 +124,7 @@ test.describe('ptjnb', () => {
   });
 });
 
-test.describe('ptjnb open-with', () => {
+test.describe('jupyter-plainb open-with', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?reset');
     await waitForFileBrowser(page);
@@ -212,7 +212,7 @@ test.describe('ptjnb open-with', () => {
   });
 });
 
-test.describe('ptjnb export', () => {
+test.describe('jupyter-plainb export', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?reset');
     await waitForFileBrowser(page);

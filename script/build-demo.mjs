@@ -10,13 +10,13 @@ try {
   execSync('python -m build --no-isolation -w', { stdio: 'inherit' });
 
   console.log('🔹 Renaming wheel...');
-  const files = glob.sync('dist/ptjnb-*.whl');
+  const files = glob.sync('dist/jupyter_plainb-*.whl');
   if (files.length === 0) throw new Error('No wheel file found in dist/');
   if (files.length > 1)
     throw new Error('Multiple wheel files found: ' + files.join(', '));
 
   const srcWheel = files[0];
-  const destWheel = path.join('dist', 'ptjnb-0.0.0-py3-none-any.whl');
+  const destWheel = path.join('dist', 'jupyter_plainb-0.0.0-py3-none-any.whl');
   fs.renameSync(srcWheel, destWheel);
   console.log(`Renamed ${srcWheel} → ${destWheel}`);
 

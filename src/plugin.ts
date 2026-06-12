@@ -89,12 +89,12 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     // Reuse toolbar items from standard notebook factory
     const toolbarFactory = settingRegistry
       ? createToolbarFactory(
-          toolbarRegistry,
-          settingRegistry,
-          'Notebook',
-          PANEL_SETTINGS,
-          translator ?? nullTranslator
-        )
+        toolbarRegistry,
+        settingRegistry,
+        'Notebook',
+        PANEL_SETTINGS,
+        translator ?? nullTranslator
+      )
       : undefined;
 
     let ptjnbId = 0;
@@ -107,9 +107,9 @@ export const plugin: JupyterFrontEndPlugin<void> = {
       fileTypeName: string;
       modelName: string;
     }> = [
-      { ext: '.py', fileTypeName: 'ptjnb-py', modelName: 'ptjnb-model-py' },
-      { ext: '.md', fileTypeName: 'ptjnb-md', modelName: 'ptjnb-model-md' }
-    ];
+        { ext: '.py', fileTypeName: 'ptjnb-py', modelName: 'ptjnb-model-py' },
+        { ext: '.md', fileTypeName: 'ptjnb-md', modelName: 'ptjnb-model-md' }
+      ];
 
     for (const { ext, fileTypeName, modelName } of EXTENSIONS) {
       app.docRegistry.addFileType({

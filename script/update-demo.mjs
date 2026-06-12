@@ -29,10 +29,10 @@ function updateFederatedExtension(inputDir, jsonFilePath) {
   }
 
   // 3. Find the target extension dict and update it
-  const target = extensions.find(ext => ext.name === 'ptjnb');
+  const target = extensions.find(ext => ext.name === 'jupyter-plainb');
 
   if (!target) {
-    console.error('Extension with name "ptjnb" not found.');
+    console.error('Extension with name "jupyter-plainb" not found.');
     process.exit(1);
   }
 
@@ -78,13 +78,13 @@ function listAllFiles(dir, baseDir = dir) {
   return entries;
 }
 
-async function buildptjnbArchive() {
-  const sourceDir = 'ptjnb';
+async function buildJupyterPlainbArchive() {
+  const sourceDir = 'jupyter_plainb';
   const destDir = 'demo/_output/xeus/xeus-kernels/kernel_packages';
-  const prefix = 'lib/python3.13/site-packages/ptjnb/';
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ptjnb-'));
+  const prefix = 'lib/python3.13/site-packages/jupyter_plainb/';
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'jupyter-plainb-'));
 
-  const existing = fs.readdirSync(destDir).find(f => f.startsWith('ptjnb'));
+  const existing = fs.readdirSync(destDir).find(f => f.startsWith('jupyter_plainb'));
   if (!existing) {
     console.log('Python package is not installed, skipping...');
     return;
@@ -103,7 +103,7 @@ async function buildptjnbArchive() {
   });
 
   /* -------------------------------------------------- */
-  /* 2. Copy new ptjnb into lib/...                */
+  /* 2. Copy new jupyter_plainb into lib/...            */
   /* -------------------------------------------------- */
 
   const targetPackDir = path.join(tempDir, prefix);
@@ -133,13 +133,13 @@ async function buildptjnbArchive() {
   console.log(`Archive updated in place: ${archivePath}`);
 }
 
-const inputPath = 'ptjnb/labextension';
-const outputPath = 'demo/_output/extensions/ptjnb';
+const inputPath = 'jupyter_plainb/labextension';
+const outputPath = 'demo/_output/extensions/jupyter-plainb';
 const jsonPath = 'demo/_output/jupyter-lite.json';
 
 (async () => {
   updateFederatedExtension(`${inputPath}/static`, jsonPath);
   await cleanAndCopy(inputPath, outputPath);
   await cleanAndCopy('demo/files', 'demo/_output/files');
-  await buildptjnbArchive();
+  await buildJupyterPlainbArchive();
 })();

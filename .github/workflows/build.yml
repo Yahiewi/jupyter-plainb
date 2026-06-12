@@ -41,7 +41,7 @@ jobs:
           python -m pip install .[test]
 
           jupyter labextension list
-          jupyter labextension list 2>&1 | grep -ie "ptjnb.*OK"
+          jupyter labextension list 2>&1 | grep -ie "jupyter-plainb.*OK"
           python -m jupyterlab.browser_check
 
       - name: Package the extension
@@ -50,13 +50,13 @@ jobs:
 
           pip install build
           python -m build
-          pip uninstall -y "ptjnb" jupyterlab
+          pip uninstall -y "jupyter-plainb" jupyterlab
 
       - name: Upload extension packages
         uses: actions/upload-artifact@v4
         with:
           name: extension-artifacts
-          path: dist/ptjnb*
+          path: dist/jupyter_plainb*
           if-no-files-found: error
 
   test_isolated:
@@ -78,10 +78,10 @@ jobs:
           sudo rm -rf $(which node)
           sudo rm -rf $(which node)
 
-          pip install "jupyterlab>=4.0.0,<5" ptjnb*.whl
+          pip install "jupyterlab>=4.0.0,<5" jupyter_plainb*.whl
 
           jupyter labextension list
-          jupyter labextension list 2>&1 | grep -ie "ptjnb.*OK"
+          jupyter labextension list 2>&1 | grep -ie "jupyter-plainb.*OK"
           python -m jupyterlab.browser_check --no-browser-test
 
   build-lite:
@@ -119,8 +119,8 @@ jobs:
         run: |
           set -eux
           mkdir dist
-          mv ptjnb*.whl dist/ptjnb-0.0.0-py3-none-any.whl
-          python -m pip install dist/ptjnb*.whl
+          mv jupyter_plainb*.whl dist/jupyter_plainb-0.0.0-py3-none-any.whl
+          python -m pip install dist/jupyter_plainb*.whl
 
       - name: Build the lite site
         shell: bash -l {0}
@@ -177,7 +177,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ptjnb-lite-playwright-tests
+          name: jupyter-plainb-lite-playwright-tests
           path: |
             ui-tests/test-results
             ui-tests/playwright-report

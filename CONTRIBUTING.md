@@ -10,7 +10,7 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the ptjnb directory
+# Change directory to the jupyter-plainb directory
 
 # Set up a virtual environment and install package in development mode
 python -m venv .venv
@@ -66,12 +66,12 @@ jlpm update:demo
 ## Development uninstall
 
 ```bash
-pip uninstall ptjnb
+pip uninstall jupyter-plainb
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `ptjnb` within that folder.
+folder is located. Then you can remove the symlink named `jupyter-plainb` within that folder.
 
 ## Testing the extension
 

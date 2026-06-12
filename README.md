@@ -1,4 +1,4 @@
-# ptjnb
+# jupyter-plainb
 
 [![Github Actions Status](https://github.com/notebook-link/jupyter-plainb/workflows/Build/badge.svg)](https://github.com/notebook-link/jupyter-plainb/actions/workflows/build.yml)
 
@@ -7,7 +7,7 @@ A JupyterLab extension to convert plaintext files to Jupyter notebooks
 ## Installation
 
 ```bash
-pip install ptjnb
+pip install jupyter-plainb
 ```
 
 ## Requirements
@@ -55,7 +55,7 @@ Each rule watches a directory and converts matching files on JupyterLab startup 
 ## Uninstall
 
 ```bash
-pip uninstall ptjnb
+pip uninstall jupyter-plainb
 ```
 
 ## Contributing

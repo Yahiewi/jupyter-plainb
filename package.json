@@ -1,6 +1,6 @@
 {
     "name": "jupyter-plainb",
-    "version": "0.1.1",
+    "version": "0.2.1",
     "description": "A JupyterLab extension to convert plaintext files to jupyter notebooks",
     "keywords": [
         "jupyter",

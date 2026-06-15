@@ -39,10 +39,14 @@ export async function findPlainbConfig(
       const dirModel = await contents.get(dir, { content: true });
       if (dirModel.type === 'directory' && Array.isArray(dirModel.content)) {
         const children = dirModel.content as Contents.IModel[];
-        
+
         let foundFilename: string | null = null;
         for (const target of CONFIG_FILENAMES) {
-          if (children.some(child => child.name === target && child.type === 'file')) {
+          if (
+            children.some(
+              child => child.name === target && child.type === 'file'
+            )
+          ) {
             foundFilename = target;
             break;
           }
@@ -61,7 +65,10 @@ export async function findPlainbConfig(
         }
       }
     } catch (err) {
-      console.warn(`ptjnb: failed to check or read directory/config at "${dir}":`, err);
+      console.warn(
+        `ptjnb: failed to check or read directory/config at "${dir}":`,
+        err
+      );
     }
 
     if (dir === '') {
@@ -75,37 +82,55 @@ export async function findPlainbConfig(
   return null;
 }
 
-function parseConfigContent(filename: string, content: string): IPlainbConfig | null {
+function parseConfigContent(
+  filename: string,
+  content: string
+): IPlainbConfig | null {
   try {
     let result: IPlainbConfig | null = null;
     if (filename === 'pyproject.toml') {
       const data = toml.parse(content) as any;
       const plainbSection = data?.tool?.plainb;
       const jupytextSection = data?.tool?.jupytext;
-      const section = (plainbSection && typeof plainbSection === 'object')
-        ? plainbSection
-        : (jupytextSection && typeof jupytextSection === 'object' ? jupytextSection : null);
+      const section =
+        plainbSection && typeof plainbSection === 'object'
+          ? plainbSection
+          : jupytextSection && typeof jupytextSection === 'object'
+            ? jupytextSection
+            : null;
 
       if (section) {
         result = {
-          notebookMetadataFilter: typeof section.notebookMetadataFilter === 'string'
-            ? section.notebookMetadataFilter
-            : (typeof section.notebook_metadata_filter === 'string' ? section.notebook_metadata_filter : undefined),
-          cellMetadataFilter: typeof section.cellMetadataFilter === 'string'
-            ? section.cellMetadataFilter
-            : (typeof section.cell_metadata_filter === 'string' ? section.cell_metadata_filter : undefined)
+          notebookMetadataFilter:
+            typeof section.notebookMetadataFilter === 'string'
+              ? section.notebookMetadataFilter
+              : typeof section.notebook_metadata_filter === 'string'
+                ? section.notebook_metadata_filter
+                : undefined,
+          cellMetadataFilter:
+            typeof section.cellMetadataFilter === 'string'
+              ? section.cellMetadataFilter
+              : typeof section.cell_metadata_filter === 'string'
+                ? section.cell_metadata_filter
+                : undefined
         };
       }
     } else if (filename.endsWith('.toml')) {
       const data = toml.parse(content) as any;
       if (data && typeof data === 'object') {
         result = {
-          notebookMetadataFilter: typeof data.notebookMetadataFilter === 'string'
-            ? data.notebookMetadataFilter
-            : (typeof data.notebook_metadata_filter === 'string' ? data.notebook_metadata_filter : undefined),
-          cellMetadataFilter: typeof data.cellMetadataFilter === 'string'
-            ? data.cellMetadataFilter
-            : (typeof data.cell_metadata_filter === 'string' ? data.cell_metadata_filter : undefined)
+          notebookMetadataFilter:
+            typeof data.notebookMetadataFilter === 'string'
+              ? data.notebookMetadataFilter
+              : typeof data.notebook_metadata_filter === 'string'
+                ? data.notebook_metadata_filter
+                : undefined,
+          cellMetadataFilter:
+            typeof data.cellMetadataFilter === 'string'
+              ? data.cellMetadataFilter
+              : typeof data.cell_metadata_filter === 'string'
+                ? data.cell_metadata_filter
+                : undefined
         };
       }
     } else if (
@@ -117,24 +142,36 @@ function parseConfigContent(filename: string, content: string): IPlainbConfig | 
       const data = yaml.parse(content) as any;
       if (data && typeof data === 'object') {
         result = {
-          notebookMetadataFilter: typeof data.notebookMetadataFilter === 'string'
-            ? data.notebookMetadataFilter
-            : (typeof data.notebook_metadata_filter === 'string' ? data.notebook_metadata_filter : undefined),
-          cellMetadataFilter: typeof data.cellMetadataFilter === 'string'
-            ? data.cellMetadataFilter
-            : (typeof data.cell_metadata_filter === 'string' ? data.cell_metadata_filter : undefined)
+          notebookMetadataFilter:
+            typeof data.notebookMetadataFilter === 'string'
+              ? data.notebookMetadataFilter
+              : typeof data.notebook_metadata_filter === 'string'
+                ? data.notebook_metadata_filter
+                : undefined,
+          cellMetadataFilter:
+            typeof data.cellMetadataFilter === 'string'
+              ? data.cellMetadataFilter
+              : typeof data.cell_metadata_filter === 'string'
+                ? data.cell_metadata_filter
+                : undefined
         };
       }
     } else if (filename.endsWith('.json')) {
       const data = JSON.parse(content);
       if (data && typeof data === 'object') {
         result = {
-          notebookMetadataFilter: typeof data.notebookMetadataFilter === 'string'
-            ? data.notebookMetadataFilter
-            : (typeof data.notebook_metadata_filter === 'string' ? data.notebook_metadata_filter : undefined),
-          cellMetadataFilter: typeof data.cellMetadataFilter === 'string'
-            ? data.cellMetadataFilter
-            : (typeof data.cell_metadata_filter === 'string' ? data.cell_metadata_filter : undefined)
+          notebookMetadataFilter:
+            typeof data.notebookMetadataFilter === 'string'
+              ? data.notebookMetadataFilter
+              : typeof data.notebook_metadata_filter === 'string'
+                ? data.notebook_metadata_filter
+                : undefined,
+          cellMetadataFilter:
+            typeof data.cellMetadataFilter === 'string'
+              ? data.cellMetadataFilter
+              : typeof data.cell_metadata_filter === 'string'
+                ? data.cell_metadata_filter
+                : undefined
         };
       }
     }

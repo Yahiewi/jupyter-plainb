@@ -1,4 +1,8 @@
-import { NotebookModel, NotebookModelFactory, INotebookModel } from '@jupyterlab/notebook';
+import {
+  NotebookModel,
+  NotebookModelFactory,
+  INotebookModel
+} from '@jupyterlab/notebook';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { Contents, KernelSpec } from '@jupyterlab/services';
 import type { ISharedNotebook } from '@jupyter/ydoc';

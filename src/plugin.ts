@@ -79,8 +79,10 @@ export const plugin: JupyterFrontEndPlugin<void> = {
       cfg = {
         rules: rawCfg.rules,
         defaultKernelspec: rawCfg.defaultKernelspec,
-        notebookMetadataFilter: rawCfg.notebookMetadataFilter ?? rawCfg.notebook_metadata_filter,
-        cellMetadataFilter: rawCfg.cellMetadataFilter ?? rawCfg.cell_metadata_filter
+        notebookMetadataFilter:
+          rawCfg.notebookMetadataFilter ?? rawCfg.notebook_metadata_filter,
+        cellMetadataFilter:
+          rawCfg.cellMetadataFilter ?? rawCfg.cell_metadata_filter
       };
     } catch {
       console.error('ptjnb: invalid plainTextNotebookConfig JSON');
@@ -163,7 +165,10 @@ export const plugin: JupyterFrontEndPlugin<void> = {
 
         // Load config when the context is ready
         void widget.context.ready.then(() => {
-          void model.loadConfig(app.serviceManager.contents, widget.context.path);
+          void model.loadConfig(
+            app.serviceManager.contents,
+            widget.context.path
+          );
         });
 
         // Load config when the path changes (e.g. renamed or moved)
@@ -174,14 +179,20 @@ export const plugin: JupyterFrontEndPlugin<void> = {
         // Load config when document becomes dirty
         model.stateChanged.connect((_sender, args) => {
           if (args.name === 'dirty' && args.newValue === true) {
-            void model.loadConfig(app.serviceManager.contents, widget.context.path);
+            void model.loadConfig(
+              app.serviceManager.contents,
+              widget.context.path
+            );
           }
         });
 
         // Intercept save calls to refresh the config before save runs
         const originalSave = widget.context.save.bind(widget.context);
         widget.context.save = async () => {
-          await model.loadConfig(app.serviceManager.contents, widget.context.path);
+          await model.loadConfig(
+            app.serviceManager.contents,
+            widget.context.path
+          );
           return originalSave();
         };
 

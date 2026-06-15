@@ -34,7 +34,8 @@ export async function findPlainbConfig(
   const parts = filePath.split('/');
   let dir = parts.slice(0, -1).join('/');
 
-  while (true) {
+  let finished = false;
+  while (!finished) {
     try {
       const dirModel = await contents.get(dir, { content: true });
       if (dirModel.type === 'directory' && Array.isArray(dirModel.content)) {
@@ -72,11 +73,12 @@ export async function findPlainbConfig(
     }
 
     if (dir === '') {
-      break;
+      finished = true;
+    } else {
+      const dirParts = dir.split('/');
+      dirParts.pop();
+      dir = dirParts.join('/');
     }
-    const dirParts = dir.split('/');
-    dirParts.pop();
-    dir = dirParts.join('/');
   }
 
   return null;

@@ -39,7 +39,7 @@ import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import { IEditorServices } from '@jupyterlab/codeeditor';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
-import { PlainTextNotebookModelFactory } from './model';
+import { PlainTextNotebookModel, PlainTextNotebookModelFactory } from './model';
 
 /**
  * Setting ID for the notebook panel toolbar configuration.
@@ -75,7 +75,15 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     const cfgStr = PageConfig.getOption('plainTextNotebookConfig');
     let cfg: IPlainTextNotebookConfig = {};
     try {
-      cfg = cfgStr ? JSON.parse(cfgStr) : {};
+      const rawCfg = cfgStr ? JSON.parse(cfgStr) : {};
+      cfg = {
+        rules: rawCfg.rules,
+        defaultKernelspec: rawCfg.defaultKernelspec,
+        notebookMetadataFilter:
+          rawCfg.notebookMetadataFilter ?? rawCfg.notebook_metadata_filter,
+        cellMetadataFilter:
+          rawCfg.cellMetadataFilter ?? rawCfg.cell_metadata_filter
+      };
     } catch {
       console.error('ptjnb: invalid plainTextNotebookConfig JSON');
     }
@@ -124,7 +132,9 @@ export const plugin: JupyterFrontEndPlugin<void> = {
         new PlainTextNotebookModelFactory({
           name: modelName,
           ext,
-          specs
+          specs,
+          notebookMetadataFilter: cfg.notebookMetadataFilter,
+          cellMetadataFilter: cfg.cellMetadataFilter
         })
       );
 
@@ -149,6 +159,42 @@ export const plugin: JupyterFrontEndPlugin<void> = {
         widget.title.icon = notebookFileType?.icon ?? notebookIcon;
         widget.title.iconClass = notebookFileType?.iconClass ?? '';
         widget.title.iconLabel = notebookFileType?.iconLabel ?? '';
+
+        const model = widget.context.model as PlainTextNotebookModel;
+        model.context = widget.context;
+
+        // Load config when the context is ready
+        void widget.context.ready.then(() => {
+          void model.loadConfig(
+            app.serviceManager.contents,
+            widget.context.path
+          );
+        });
+
+        // Load config when the path changes (e.g. renamed or moved)
+        widget.context.pathChanged.connect((_sender, newPath) => {
+          void model.loadConfig(app.serviceManager.contents, newPath);
+        });
+
+        // Load config when document becomes dirty
+        model.stateChanged.connect((_sender, args) => {
+          if (args.name === 'dirty' && args.newValue === true) {
+            void model.loadConfig(
+              app.serviceManager.contents,
+              widget.context.path
+            );
+          }
+        });
+
+        // Intercept save calls to refresh the config before save runs
+        const originalSave = widget.context.save.bind(widget.context);
+        widget.context.save = async () => {
+          await model.loadConfig(
+            app.serviceManager.contents,
+            widget.context.path
+          );
+          return originalSave();
+        };
 
         if (notebookTracker) {
           const tracker = notebookTracker as NotebookTracker;

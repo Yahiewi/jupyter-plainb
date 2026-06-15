@@ -1,4 +1,8 @@
-import { NotebookModel, NotebookModelFactory } from '@jupyterlab/notebook';
+import {
+  NotebookModel,
+  NotebookModelFactory,
+  INotebookModel
+} from '@jupyterlab/notebook';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { Contents, KernelSpec } from '@jupyterlab/services';
 import type { ISharedNotebook } from '@jupyter/ydoc';
@@ -9,6 +13,7 @@ import {
   extractKernelspecFromText,
   kernelspecFromLanguage
 } from './convert';
+import { findPlainbConfig } from './config';
 
 /**
  * A custom NotebookModel that parses and serializes from/to plain text. The
@@ -20,11 +25,32 @@ export class PlainTextNotebookModel extends NotebookModel {
     options: NotebookModel.IOptions & {
       ext: string;
       specs?: KernelSpec.ISpecModels | null;
+      notebookMetadataFilter?: string;
+      cellMetadataFilter?: string;
     }
   ) {
     super(options);
     this._ext = options.ext;
     this._specs = options.specs ?? null;
+    this._defaultNotebookMetadataFilter = options.notebookMetadataFilter;
+    this._defaultCellMetadataFilter = options.cellMetadataFilter;
+    this.notebookMetadataFilter = options.notebookMetadataFilter;
+    this.cellMetadataFilter = options.cellMetadataFilter;
+  }
+
+  async loadConfig(contents: Contents.IManager, path: string): Promise<void> {
+    try {
+      const config = await findPlainbConfig(contents, path);
+      if (config) {
+        this.notebookMetadataFilter = config.notebookMetadataFilter;
+        this.cellMetadataFilter = config.cellMetadataFilter;
+      } else {
+        this.notebookMetadataFilter = this._defaultNotebookMetadataFilter;
+        this.cellMetadataFilter = this._defaultCellMetadataFilter;
+      }
+    } catch (err) {
+      console.warn('ptjnb: failed to load configuration', err);
+    }
   }
 
   toString(): string {
@@ -50,7 +76,10 @@ export class PlainTextNotebookModel extends NotebookModel {
       }
     }
 
-    return serializeFormat(json, this._format);
+    return serializeFormat(json, this._format, {
+      notebookMetadataFilter: this.notebookMetadataFilter,
+      cellMetadataFilter: this.cellMetadataFilter
+    });
   }
 
   fromString(value: string): void {
@@ -80,9 +109,15 @@ export class PlainTextNotebookModel extends NotebookModel {
     super.fromJSON(notebook);
   }
 
+  context: DocumentRegistry.IContext<INotebookModel> | null = null;
+  public notebookMetadataFilter?: string;
+  public cellMetadataFilter?: string;
+
   private _ext: string;
   private _format: PlainbFormat = 'percent';
   private _specs: KernelSpec.ISpecModels | null;
+  private _defaultNotebookMetadataFilter?: string;
+  private _defaultCellMetadataFilter?: string;
 }
 
 /**
@@ -94,12 +129,16 @@ export class PlainTextNotebookModelFactory extends NotebookModelFactory {
       name: string;
       ext: string;
       specs?: KernelSpec.ISpecModels | null;
+      notebookMetadataFilter?: string;
+      cellMetadataFilter?: string;
     }
   ) {
     super(options);
     this._name = options.name;
     this._ext = options.ext;
     this._specs = options.specs ?? null;
+    this._notebookMetadataFilter = options.notebookMetadataFilter;
+    this._cellMetadataFilter = options.cellMetadataFilter;
   }
 
   get name(): string {
@@ -120,11 +159,15 @@ export class PlainTextNotebookModelFactory extends NotebookModelFactory {
     return new PlainTextNotebookModel({
       ...options,
       ext: this._ext,
-      specs: this._specs
+      specs: this._specs,
+      notebookMetadataFilter: this._notebookMetadataFilter,
+      cellMetadataFilter: this._cellMetadataFilter
     });
   }
 
   private _name: string;
   private _ext: string;
   private _specs: KernelSpec.ISpecModels | null;
+  private _notebookMetadataFilter?: string;
+  private _cellMetadataFilter?: string;
 }

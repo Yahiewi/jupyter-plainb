@@ -1,0 +1,15 @@
+# Configuration options for plainb / jupytext notebooks.
+# 
+# File naming & location discovery:
+# - Searches current directory and traverses upwards to the workspace root.
+# - Supported filenames (in order of priority):
+#   - plainb.toml, .plainb.toml, plainb.yaml, plainb.yml, plainb.json, .plainb
+#   - jupytext.toml, .jupytext.toml, jupytext.yaml, jupytext.yml, jupytext.json, .jupytext
+#   - pyproject.toml (reads configuration from [tool.plainb], falling back to [tool.jupytext])
+#
+# Supported key formats:
+# - Both camelCase (notebookMetadataFilter, cellMetadataFilter) and snake_case 
+#   (notebook_metadata_filter, cell_metadata_filter) keys are accepted and supported.
+
+notebook_metadata_filter="kernelspec,jupytext,exports,math,rise,semantic,learning,-jupytext.text_representation.jupytext_version,title,options"
+cell_metadata_filter="all,-autoscroll,-collapsed,-heading_collapsed,-scrolled,-trusted,-ExecuteTime,-jp-MarkdownHeadingCollapsed,-user_expressions,-execution"

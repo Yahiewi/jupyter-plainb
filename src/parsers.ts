@@ -30,6 +30,8 @@ export interface IKernelspec {
 export interface IPlainTextNotebookConfig {
   rules?: IRule[];
   defaultKernelspec?: IKernelspec;
+  notebookMetadataFilter?: string;
+  cellMetadataFilter?: string;
 }
 
 export const PARSERS: Record<ParserName, (text: string) => object> = {

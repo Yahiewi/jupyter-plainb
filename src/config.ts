@@ -24,6 +24,19 @@ const CONFIG_FILENAMES = [
 ];
 
 /**
+ * Decodes a base64 encoded string to a UTF-8 string.
+ * Important for notebook.link where the config file content is base64 encoded.
+ */
+function decodeBase64ToUtf8(base64: string): string {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+/**
  * Searches directories upwards from `filePath` to the workspace root `""`
  * to find and parse plainb/jupytext configuration.
  */
@@ -56,7 +69,14 @@ export async function findPlainbConfig(
         if (foundFilename) {
           const configPath = dir ? `${dir}/${foundFilename}` : foundFilename;
           const fileModel = await contents.get(configPath, { content: true });
-          const text = fileModel.content;
+          let text = fileModel.content;
+          if (fileModel.format === 'base64' && typeof text === 'string') {
+            try {
+              text = decodeBase64ToUtf8(text);
+            } catch (err) {
+              console.error('ptjnb: failed to decode base64 config content', err);
+            }
+          }
           if (typeof text === 'string') {
             const parsed = parseConfigContent(foundFilename, text);
             if (parsed) {

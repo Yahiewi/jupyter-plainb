@@ -74,7 +74,10 @@ export async function findPlainbConfig(
             try {
               text = decodeBase64ToUtf8(text);
             } catch (err) {
-              console.error('ptjnb: failed to decode base64 config content', err);
+              console.error(
+                'ptjnb: failed to decode base64 config content',
+                err
+              );
             }
           }
           if (typeof text === 'string') {
